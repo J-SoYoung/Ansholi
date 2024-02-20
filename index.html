@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnsHoli</title>
+</head>
+<body>
+    <input id="worker_name" type="text" placeholder="근무자 이름을 입력해주세요">
+    <input id="holiday" type="number" placeholder="근무자 휴일 수를 입력해주세요">
+    <div class="">
+      <input id="check_worker_parttime_am" type="radio" name="check_parttime" checked>
+      <label for="check_worker_parttime_am" class="form-check-label">
+          AM
+      </label>
+      <input id="check_worker_parttime_pm" type="radio" name="check_parttime">
+      <label for="check_worker_parttime_pm" class="form-check-label">
+          PM
+      </label>
+    </div>
+    <button id="worker_add_button" onclick="addWorker()">근무자 추가</button>    
+    <div id="worker_info"></div>
+    
+    <button id="worker_add_button" onclick="addHoliday()">휴일 지정</button>
+
+    <div>1<span id="holi_user"></span></div>
+    <div>2<span id="holi_user"></span></div>
+    <div>3<span id="holi_user"></span></div>
+    <div>4<span ></span></div>
+    <div>5<span></span></div>
+    <div>6<span></span></div>
+    <div>7<span></span></div>
+    <div>8<span></span></div>
+    <div>9<span></span></div>
+    <div>10<span></span></div>
+    <div>11<span></span></div>
+    <div>12<span></span></div>
+    <div>13<span></span></div>
+    <div>14<span></span></div>
+  
+
+  <script>
+    
+    const $worker_add_button = document.getElementById('worker_add_button')
+    
+
+    function addWorker(){
+      const worker_name = document.getElementById('worker_name').value
+      const holiday = document.getElementById('holiday').value
+      const partTime = document.querySelector('input[name="check_parttime"]:checked').nextElementSibling.innerHTML;
+      
+      const workerInfoDiv = document.createElement("div");  
+          workerInfoDiv.textContent=`${worker_name}(${partTime}) - 휴일 수: ${holiday}`          
+          document.getElementById("worker_info").appendChild(workerInfoDiv);
+    }
+
+    function addHoliday(){
+      
+    }
+
+  </script>
+</body>
+</html>
