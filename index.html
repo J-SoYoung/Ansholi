@@ -1,63 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AnsHoli</title>
 </head>
-<body>
-    <input id="worker_name" type="text" placeholder="근무자 이름을 입력해주세요">
-    <input id="holiday" type="number" placeholder="근무자 휴일 수를 입력해주세요">
-    <div class="">
-      <input id="check_worker_parttime_am" type="radio" name="check_parttime" checked>
-      <label for="check_worker_parttime_am" class="form-check-label">
-          AM
-      </label>
-      <input id="check_worker_parttime_pm" type="radio" name="check_parttime">
-      <label for="check_worker_parttime_pm" class="form-check-label">
-          PM
-      </label>
-    </div>
-    <button id="worker_add_button" onclick="addWorker()">근무자 추가</button>    
-    <div id="worker_info"></div>
-    
-    <button id="worker_add_button" onclick="addHoliday()">휴일 지정</button>
 
-    <div>1<span id="holi_user"></span></div>
-    <div>2<span id="holi_user"></span></div>
-    <div>3<span id="holi_user"></span></div>
-    <div>4<span ></span></div>
-    <div>5<span></span></div>
-    <div>6<span></span></div>
-    <div>7<span></span></div>
-    <div>8<span></span></div>
-    <div>9<span></span></div>
-    <div>10<span></span></div>
-    <div>11<span></span></div>
-    <div>12<span></span></div>
-    <div>13<span></span></div>
-    <div>14<span></span></div>
-  
+<body>
+  <input id="worker_name" type="text" placeholder="근무자 이름을 입력해주세요">
+  <!-- <input id="holidays" type="number" placeholder="근무자 휴일 수를 입력해주세요"> -->
+  <div class="">
+    <input id="check_worker_parttime_am" type="radio" name="check_parttime" checked>
+    <label for="check_worker_parttime_am" class="form-check-label">AM</label>
+    <input id="check_worker_parttime_pm" type="radio" name="check_parttime">
+    <label for="check_worker_parttime_pm" class="form-check-label">PM</label>
+  </div>
+  <button id="worker_add_button" onclick="addWorker()">근무자 추가</button>
+  <div id="worker_info"></div>
+
+  <button id="worker_add_button" onclick="setHolidays()">휴일 지정</button>
+  <div id="worker_holiday_info"></div>
+  <div id="days_info"></div>
 
   <script>
-    
-    const $worker_add_button = document.getElementById('worker_add_button')
-    
+    let workers = []
+    // const monthDays = Array(30).fill().map((ele, i) => i + 1)
+    const monthDays = Array.from({ length: 30 }, (_, i) => i + 1);
+    const holidaysCount = 7
 
-    function addWorker(){
-      const worker_name = document.getElementById('worker_name').value
-      const holiday = document.getElementById('holiday').value
-      const partTime = document.querySelector('input[name="check_parttime"]:checked').nextElementSibling.innerHTML;
-      
-      const workerInfoDiv = document.createElement("div");  
-          workerInfoDiv.textContent=`${worker_name}(${partTime}) - 휴일 수: ${holiday}`          
-          document.getElementById("worker_info").appendChild(workerInfoDiv);
+    const $worker_info = document.getElementById('worker_info')
+    const $worker_holiday_info = document.getElementById('worker_holiday_info')
+    const $days_info = document.getElementById('days_info');
+
+    function addWorker() {
+      const $worker_name = document.getElementById('worker_name')
+      const partTime = document.querySelector('input[name="check_parttime"]:checked').nextElementSibling.textContent;
+      workers.push({ name: worker_name.value, partTime: partTime, holidays: [] })
+
+      const $worker_info_div = document.createElement("div");
+      workers.forEach((worker) => {
+        return $worker_info_div.textContent = `${worker.name}(${worker.partTime})`
+      })
+
+      $worker_info.appendChild($worker_info_div);
+      $worker_name.value = ''
     }
 
-    function addHoliday(){
-      
+    function setHolidays() {
+      const month = Array(30).fill().map((ele, i) => i + 1)
+      for (let i = 0; i < workers.length; i++) {
+        for (let j = 1; j <= holidaysCount; j++) {
+          const setHoliday = Math.floor((Math.random() * month.length) + 1)
+          const spliceHoliday = month.splice(setHoliday, 1)
+          workers[i].holidays.push(...spliceHoliday)
+          workers[i].holidays.sort((a, b) => a - b)
+        }
+        const $worker_holiday_div = document.createElement("div");
+        $worker_holiday_div.textContent = `${workers[i].name}- ${workers[i].holidays}`
+        $worker_holiday_info.appendChild($worker_holiday_div)
+      }
+      console.log(workers)
+      updateDaysInfo();
+    }
+
+    function updateDaysInfo() {
+      $days_info.innerHTML = '';
+      monthDays.forEach((day) => {
+        const $day_info_div = document.createElement('div');
+        $day_info_div.textContent = `Day ${day} ${getWorkerNamesForDay(day)}`;
+        $days_info.appendChild($day_info_div);
+      });
+    }
+
+    function getWorkerNamesForDay(day) {
+      const workerNames = workers.filter((worker) => worker.holidays.includes(day)).map((worker) => worker.name)
+      console.log(workerNames)
+      return workerNames.join(' ');
     }
 
   </script>
 </body>
+
 </html>
