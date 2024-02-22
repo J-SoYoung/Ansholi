@@ -9,12 +9,18 @@
 
 <body>
   <input id="worker_name" type="text" placeholder="근무자 이름을 입력해주세요">
-  <!-- <input id="holidays" type="number" placeholder="근무자 휴일 수를 입력해주세요"> -->
-  <div class="">
+  <input id="holidaysCount" type="number" placeholder="근무자 휴일 수를 입력해주세요">
+  <div>
     <input id="check_worker_parttime_am" type="radio" name="check_parttime" checked>
     <label for="check_worker_parttime_am" class="form-check-label">AM</label>
     <input id="check_worker_parttime_pm" type="radio" name="check_parttime">
     <label for="check_worker_parttime_pm" class="form-check-label">PM</label>
+  </div>
+  <div>
+    <input id="check_worker_master" type="radio" name="check_partMaster" checked>
+    <label for="check_worker_master" class="form-check-label">master</label>
+    <input id="check_worker_basic" type="radio" name="check_partMaster" checked>
+    <label for="check_worker_basic" class="form-check-label">basic</label>
   </div>
   <button id="worker_add_button" onclick="addWorker()">근무자 추가</button>
   <div id="worker_info"></div>
@@ -24,46 +30,97 @@
   <div id="days_info"></div>
 
   <script>
-    let workers = []
-    // const monthDays = Array(30).fill().map((ele, i) => i + 1)
+    let workers = [
+      // { name: '소영', partTime: 'PM', partMaster: 'master', holidays: [], holidaysCount: 7 },
+      // { name: '주희', partTime: 'PM', partMaster: 'master', holidays: [], holidaysCount: 7 },
+      // { name: '소연', partTime: 'PM', partMaster: 'basic', holidays: [], holidaysCount: 7 },
+      // { name: '지현', partTime: 'PM', partMaster: 'basic', holidays: [], holidaysCount: 7 },
+      // { name: '하늘', partTime: 'AM', partMaster: 'master', holidays: [], holidaysCount: 7 },
+      // { name: '소윤', partTime: 'AM', partMaster: 'master', holidays: [], holidaysCount: 7 },
+      // { name: '유라', partTime: 'AM', partMaster: 'basic', holidays: [], holidaysCount: 7 },
+      // { name: '세경', partTime: 'AM', partMaster: 'basic', holidays: [], holidaysCount: 7 },
+    ]
     const monthDays = Array.from({ length: 30 }, (_, i) => i + 1);
-    const holidaysCount = 7
-
     const $worker_info = document.getElementById('worker_info')
     const $worker_holiday_info = document.getElementById('worker_holiday_info')
     const $days_info = document.getElementById('days_info');
 
+    // 근무자 추가
     function addWorker() {
       const $worker_name = document.getElementById('worker_name')
+      const $holidaysCount = document.getElementById('holidaysCount')
+
+      const worker_name = $worker_name.value
+      const holidaysCount = $holidaysCount.value
       const partTime = document.querySelector('input[name="check_parttime"]:checked').nextElementSibling.textContent;
-      workers.push({ name: worker_name.value, partTime: partTime, holidays: [] })
+      const partMaster = document.querySelector('input[name="check_partMaster"]:checked').nextElementSibling.textContent;
+
+      if (worker_name == '') return alert('근무자를 작성해주세요')
+      if (holidaysCount == '') return alert('휴무일을 작성해주세요')
+
+      workers.push({ name: worker_name, partTime: partTime, partMaster: partMaster, holidays: [], holidaysCount: holidaysCount })
+      console.log(workers)
 
       const $worker_info_div = document.createElement("div");
       workers.forEach((worker) => {
-        return $worker_info_div.textContent = `${worker.name}(${worker.partTime})`
+        return $worker_info_div.textContent = `${worker.name} ( ${worker.partTime}- 휴무 ${holidaysCount}일 )`
       })
 
       $worker_info.appendChild($worker_info_div);
       $worker_name.value = ''
+      $holidaysCount.value = ''
     }
 
+    // 휴일 지정
     function setHolidays() {
-      const month = Array(30).fill().map((ele, i) => i + 1)
-      for (let i = 0; i < workers.length; i++) {
-        for (let j = 1; j <= holidaysCount; j++) {
-          const setHoliday = Math.floor((Math.random() * month.length) + 1)
-          const spliceHoliday = month.splice(setHoliday, 1)
-          workers[i].holidays.push(...spliceHoliday)
-          workers[i].holidays.sort((a, b) => a - b)
-        }
+      const month = Array(30).fill().map((ele, i) => ({
+        day: i + 1,
+        workers: [
+          { name: '', partTime: '', partMaster: 'basic', holidays: [], holidaysCount: 7 },
+          { name: '', partTime: '', partMaster: 'basic', holidays: [], holidaysCount: 7 }
+        ]
+      }))
+      // const month = Array(30).fill().map((ele, i) => i + 1)
+
+      // 각 worker들마다 휴일수를 정해야함. -> 그럼 workers배열을 사용할 것이므로 배열 메서드사용 로 해야할듯.
+      // for (let i = 0; i < workers.length; i++) {
+      //   for (let j = 1; j <= holidaysCount; j++) {
+      //     const setHoliday = Math.floor((Math.random() * month.length) + 1)
+      //     const spliceHoliday = month.splice(setHoliday, 1)
+      //     workers[i].holidays.push(...spliceHoliday)
+      //     workers[i].holidays.sort((a, b) => a - b)
+      //   }
+      //   const $worker_holiday_div = document.createElement("div");
+      //   $worker_holiday_div.textContent = `${workers[i].name}- ${workers[i].holidays}`
+      //   $worker_holiday_info.appendChild($worker_holiday_div)
+      // }
+      // updateDaysInfo();
+      month.forEach((m, index) => {
+        console.log(m.workers)
+        const workerAM = workers.filter((worker) => worker.partTime == "AM")
+        const workerPM = workers.filter((worker) => worker.partTime == "PM")
+
+        const idxRepeat = index % workerAM.length;
+
+        m.workers[0] = workerAM[idxRepeat];
+        m.workers[1] = workerPM[idxRepeat];
+
         const $worker_holiday_div = document.createElement("div");
-        $worker_holiday_div.textContent = `${workers[i].name}- ${workers[i].holidays}`
+        // const AM = `${m.workers[index1].name}(${m.workers[index1].partTime}) ${m.workers[index1].partMaster == 'master' ? '★' : ""}`
+        // const PM = `${m.workers[index2].name}(${m.workers[index2].partTime}) ${m.workers[index2].partMaster == 'master' ? '★' : ""}`
+
+        const curWorkerAM = m.workers[0].name
+        const curWorkerAM_m = m.workers[0].partMaster === 'master' ? "★" : ""
+        const curWorkerPM = m.workers[1].name
+        const curWorkerPM_m = m.workers[1].partMaster === 'master' ? "★" : ""
+
+        $worker_holiday_div.textContent = `${m.day}일 : ${curWorkerAM}${curWorkerAM_m} / ${curWorkerPM}${curWorkerPM_m}  `
         $worker_holiday_info.appendChild($worker_holiday_div)
-      }
-      console.log(workers)
-      updateDaysInfo();
+      })
+      console.log(month)
     }
 
+    // 날짜 + 휴무 표시 ( calendar )
     function updateDaysInfo() {
       $days_info.innerHTML = '';
       monthDays.forEach((day) => {
@@ -73,9 +130,9 @@
       });
     }
 
+    // 휴무날에 이름 표시
     function getWorkerNamesForDay(day) {
       const workerNames = workers.filter((worker) => worker.holidays.includes(day)).map((worker) => worker.name)
-      console.log(workerNames)
       return workerNames.join(' ');
     }
 
